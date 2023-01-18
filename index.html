@@ -1,0 +1,151 @@
+<html>
+    <head>
+        <title>Transaction App</title>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.2.7-rc.0/web3.min.js"></script>
+    </head>
+    <body>
+        <div id="title">
+            <h1>WELCOME TO MY APP</h1>
+            <h3>please enter the required data</h3>
+        </div>
+        <hr>
+        <div>
+            <button onclick="connectMetamask()">Connect to Meta Mask</button>
+            <p id="your_acc">Your account:</p>
+        </div>
+        <hr>
+        <div>
+            <label for="name">Name:</label><br>
+            <input type="text" id="name" name="name" value="John"><br>
+            <label for="date">Date:</label><br>
+            <input type="date" id="date" name="date" value="15-07-2001"><br>
+            <label for="people">Number of People:</label><br>
+            <input type="number" id="people" name="people" value="3"><br>
+            <Button onclick="executeContract()">Submit</Button> 
+        </div>
+        <hr><br>
+        <button onclick="readContract()">List all transactions</button>
+        <br><br>
+
+        <script>
+            let account;
+            const connectMetamask = async () => {
+                if(window.ethereum !== "undefined") {
+                    const accounts = await ethereum.request({method: "eth_requestAccounts"});
+                    account = accounts[0];
+                    document.getElementById("your_acc").innerHTML = `Your account: ${account}`;
+                    connectContract();
+                }
+            }
+
+            const connectContract = async () => {
+                const ABI = [
+                    {
+                        "inputs": [
+                            {
+                                "internalType": "address payable",
+                                "name": "recipiant",
+                                "type": "address"
+                            }
+                        ],
+                        "name": "sendAmount",
+                        "outputs": [],
+                        "stateMutability": "payable",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [
+                            {
+                                "internalType": "string",
+                                "name": "nameOfRes",
+                                "type": "string"
+                            },
+                            {
+                                "internalType": "string",
+                                "name": "dateSent",
+                                "type": "string"
+                            },
+                            {
+                                "internalType": "int8",
+                                "name": "places",
+                                "type": "int8"
+                            }
+                        ],
+                        "name": "setReservationName",
+                        "outputs": [],
+                        "stateMutability": "nonpayable",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [],
+                        "name": "storeValue",
+                        "outputs": [],
+                        "stateMutability": "payable",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [],
+                        "name": "getTransactions",
+                        "outputs": [
+                            {
+                                "components": [
+                                    {
+                                        "internalType": "string",
+                                        "name": "name",
+                                        "type": "string"
+                                    },
+                                    {
+                                        "internalType": "string",
+                                        "name": "date",
+                                        "type": "string"
+                                    },
+                                    {
+                                        "internalType": "int8",
+                                        "name": "pl",
+                                        "type": "int8"
+                                    }
+                                ],
+                                "internalType": "struct SendETH.reservation[]",
+                                "name": "",
+                                "type": "tuple[]"
+                            }
+                        ],
+                        "stateMutability": "view",
+                        "type": "function"
+                    }
+                ];
+                const Address = "0x5cca5db6b1C52416ec01e4eaDfbfd67cA1b30d45";
+                window.web3 = await new Web3(window.ethereum);
+                window.contract = await new window.web3.eth.Contract( ABI, Address); 
+            }
+
+            const readContract = async () => {
+                const data = await window.contract.methods.myCity().call();
+
+            }
+
+            const sendData = async () => {
+                const name = document.getElementById("name").value;
+                const date = document.getElementById("date").value;
+                const people = document.getElementById("people").value;
+
+                await window.contract.methods.setReservationName(name,date,people).send({from: account});
+            }
+            
+            const depositETH = async () => {
+                const amount = (document.getElementById("people").value) * 1000000000000000000;
+                await window.contract.methods.storeValue().send({from: account, value: amount});
+            }
+
+            const executeContract = async () => {
+                sendData();
+                depositETH();
+                
+                const add = "0xDC70ca2505ca3dfD7a8e537B901C5b5C6620C0f7";
+
+                await window.contract.methods.sendAmount(add).send({from: account});
+            }
+        </script>
+    </body>
+
+</html>
