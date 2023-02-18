@@ -10,11 +10,11 @@ contract SendETH{
         int8 pl;
     }
 
-    uint256 public balance = 0;
-    string public nameOfReservation;
-    string public date;
-    int8 public pl;
-    reservation[] public reservations;
+    uint256 private balance = 0;
+    string private nameOfReservation;
+    string private date;
+    int8 private pl;
+    reservation[] private reservations;
 
     function storeValue() payable external {
         balance += msg.value;
@@ -32,8 +32,8 @@ contract SendETH{
         balance = 0;
     }
 
-    function getTransactions() external view returns (reservation[] memory){
-        return reservations;
+    function getTransactions(uint256 num) external view returns (reservation memory){
+        return reservations[num];
     }
 
 }

@@ -2,30 +2,31 @@
     <head>
         <title>Transaction App</title>
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.2.7-rc.0/web3.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="css/index_style.css">
     </head>
     <body>
-        <div id="title">
-            <h1>WELCOME TO MY APP</h1>
-            <h3>please enter the required data</h3>
-        </div>
+        <header>
+			<nav id="navy">
+			<img id="nav_img" src="img/LogoT.png" alt="logo">
+				<ul>
+					<li><a href="#nav_img">Home</a></li>
+					<li><a href="#thingy">Send Money</a></li>
+					<li><a href="#thingy">Donate</a></li>
+				</ul>
+			<button class="button1" onclick="connectMetamask()"> Connect </button>
+			</nav>
+		</header>
+		<div id="main_image">
+			<img id="main_image_image" src="img/Logo.png" alt="main_image">
+			<h1></h1>
+		</div>
+		<div id="button_div">
+			<button class="button2" onclick="connectContract1()">Transaction</button>
+			<button class="button2" onclick="connectContract2()">Donate</button>
+		</div>
         <hr>
-        <div>
-            <button onclick="connectMetamask()">Connect to Meta Mask</button>
-            <p id="your_acc">Your account:</p>
+        <div id="thingy">
         </div>
-        <hr>
-        <div>
-            <label for="name">Name:</label><br>
-            <input type="text" id="name" name="name" value="John"><br>
-            <label for="date">Date:</label><br>
-            <input type="date" id="date" name="date" value="15-07-2001"><br>
-            <label for="people">Number of People:</label><br>
-            <input type="number" id="people" name="people" value="3"><br>
-            <Button onclick="executeContract()">Submit</Button> 
-        </div>
-        <hr><br>
-        <button onclick="readContract()">List all transactions</button>
-        <br><br>
 
         <script>
             let account;
@@ -33,12 +34,18 @@
                 if(window.ethereum !== "undefined") {
                     const accounts = await ethereum.request({method: "eth_requestAccounts"});
                     account = accounts[0];
-                    document.getElementById("your_acc").innerHTML = `Your account: ${account}`;
-                    connectContract();
+                    document.getElementById("navy").innerHTML = `
+                        <img id="nav_img" src="img/LogoT.png" alt="logo">
+                        <ul>
+                            <li><a href="#nav_img">Home</a></li>
+                            <li><a href="#thingy">Send Money</a></li>
+                            <li><a href="#thingy">Donate</a></li>
+                        </ul> 
+                        <h4 id="acc">${account}</h4>`;
                 }
             }
 
-            const connectContract = async () => {
+            const connectContract1 = async () => {
                 const ABI = [
                     {
                         "inputs": [
@@ -84,7 +91,13 @@
                         "type": "function"
                     },
                     {
-                        "inputs": [],
+                        "inputs": [
+                            {
+                                "internalType": "uint256",
+                                "name": "num",
+                                "type": "uint256"
+                            }
+                        ],
                         "name": "getTransactions",
                         "outputs": [
                             {
@@ -105,45 +118,141 @@
                                         "type": "int8"
                                     }
                                 ],
-                                "internalType": "struct SendETH.reservation[]",
+                                "internalType": "struct SendETH.reservation",
                                 "name": "",
-                                "type": "tuple[]"
+                                "type": "tuple"
                             }
                         ],
                         "stateMutability": "view",
                         "type": "function"
                     }
                 ];
-                const Address = "0x5cca5db6b1C52416ec01e4eaDfbfd67cA1b30d45";
+                const Address = "0x2229d5305f623A00fB00A24Fc1Ff41B678705F3D";
                 window.web3 = await new Web3(window.ethereum);
-                window.contract = await new window.web3.eth.Contract( ABI, Address); 
+                window.contract = await new window.web3.eth.Contract( ABI, Address);
+                
+                document.getElementById("thingy").innerHTML =`
+                <div id="left">
+                    <label class="lab" for="name">Name:</label><br>
+                    <input class="inp" type="text" id="name" name="name" value="John"><br>
+                    <label class="lab" for="date">Date:</label><br>
+                    <input class="inp" type="date" id="date" name="date" value="15-07-2001"><br>
+                    <label class="lab" for="people">Number of People:</label><br>
+                    <input class="inp" type="number" id="people" name="people" value="3"><br>
+                    <button class="button2" onclick="executeContract1()">Submit</button>
+                    <button class="button2" onclick="readContract()">List Transactions</button>
+                </div>
+                <div id="right">
+                </div>         
+                `
+            }
+
+            const connectContract2 = async () => {
+                const ABI = [
+                    {
+                        "inputs": [],
+                        "stateMutability": "nonpayable",
+                        "type": "constructor"
+                    },
+                    {
+                        "inputs": [
+                            {
+                                "internalType": "address payable",
+                                "name": "_add",
+                                "type": "address"
+                            }
+                        ],
+                        "name": "addAcount",
+                        "outputs": [],
+                        "stateMutability": "nonpayable",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [],
+                        "name": "getAmount",
+                        "outputs": [],
+                        "stateMutability": "payable",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [],
+                        "name": "getArrSize",
+                        "outputs": [
+                            {
+                                "internalType": "uint256",
+                                "name": "",
+                                "type": "uint256"
+                            }
+                        ],
+                        "stateMutability": "view",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [],
+                        "name": "sendMoneyToAcc",
+                        "outputs": [],
+                        "stateMutability": "payable",
+                        "type": "function"
+                    }
+                ];
+                const Address = "0x9F6edb71D755CB30ee82BB89Ef21921c9614A017";
+                window.web3 = await new Web3(window.ethereum);
+                window.contract = await new window.web3.eth.Contract( ABI, Address);
+                
+                document.getElementById("thingy").innerHTML =`
+                <div id="left">
+                    <label class="lab" for="amount">Enter Amount:</label><br>
+                    <input class="inp" type="amount" id="amount" name="amount" value="3"><br>
+                    <button class="button2" onclick="executeContract2()">Submit</button>
+                    <button class="button2" onclick="printy()">Add Acount</button>
+                </div>
+                <div id="right">
+                </div>        
+                `
             }
 
             const readContract = async () => {
-                const data = await window.contract.methods.myCity().call();
-
+                document.getElementById("right").innerHTML = `<h1>Will be added in Version 2.0</h1>`;
+                const data = await window.contract.methods.getTransactions(0);
+                console.log(data);
             }
 
-            const sendData = async () => {
+            const printy = async () => {
+                document.getElementById("right").innerHTML = `
+                    <label class="lab" for="amount">Enter Account:</label><br>
+                    <input class="inp" type="text" id="ad" name="ad"><br>
+                    <button class="button2" onclick="addAcc()">Submit</button>
+                `;
+            }
+
+            const executeContract1 = async () => {
+                //send data to contract
                 const name = document.getElementById("name").value;
                 const date = document.getElementById("date").value;
                 const people = document.getElementById("people").value;
-
                 await window.contract.methods.setReservationName(name,date,people).send({from: account});
-            }
-            
-            const depositETH = async () => {
-                const amount = (document.getElementById("people").value) * 1000000000000000000;
+
+                //deposit ETH to contract
+                const amount = people * 1000000000000000000;
                 await window.contract.methods.storeValue().send({from: account, value: amount});
+                
+                //send money to this acc
+                const add = "0x9D30df64f8532A1236cC0f0079247225ed951A30";
+                await window.contract.methods.sendAmount(add).send({from: account});
             }
 
-            const executeContract = async () => {
-                sendData();
-                depositETH();
-                
-                const add = "0xDC70ca2505ca3dfD7a8e537B901C5b5C6620C0f7";
+            const executeContract2 = async () => {
+                //get the money
+                const amount = (document.getElementById("amount").value) * 1000000000000000000;
+                await window.contract.methods.getAmount().send({from: account, value: amount});
 
-                await window.contract.methods.sendAmount(add).send({from: account});
+                //send money
+                await window.contract.methods.sendMoneyToAcc().send({from: account});
+            }
+
+            const addAcc = async () => {
+                const addy = document.getElementById("ad").value;
+                await window.contract.methods.addAcount(addy).send({from: account});
             }
         </script>
     </body>
